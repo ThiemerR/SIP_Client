@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Serializable class which include a List of Contacts
+ * @author Robert Thieme
+ */
 public class ContactList implements Serializable
 {
     List<Contact> m_ContactList = new ArrayList<Contact>();

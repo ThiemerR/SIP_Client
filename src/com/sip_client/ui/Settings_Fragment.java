@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
  * Author: Robert Thieme
- * Edit Change Many Setting, Use PreferenceFragment,  
+ * Edit Change Many Setting, Use PreferenceFragment,  Update Summaries
  */
 package com.sip_client.ui;
 
@@ -51,7 +51,13 @@ import android.widget.EditText;
 
 import com.example.sip_client.R;
 import com.sip_client.MainActivity;
-
+/**
+ * PreferenceFragment class uses some code of Sipdroid Settings_Fragment.java
+ * Saves the Settings for the Client like SIP profile data
+ * Use for the the layout /res/xml/preferences.xml
+ * @author Robert Thieme
+ * @author Copyright (C) 2009 The Sipdroid Open Source Project 
+ */
 public class Settings_Fragment extends PreferenceFragment implements OnSharedPreferenceChangeListener, OnClickListener
 {  
     // All possible values of the PREF_PREF preference (see bellow)
@@ -60,7 +66,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     public static final String       VAL_PREF_SIPONLY         = "SIPONLY";
     public static final String       VAL_PREF_ASK             = "ASK";
 
-    /*-
+    /*
      * ****************************************
      * **** HOW TO USE SHARED PREFERENCES *****
      * ****************************************
@@ -223,6 +229,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     // public static final String DEFAULT_RINGTONEx = "";
     // public static final String DEFAULT_VOLUMEx = "";
 
+    // //////////////////////////////////////////////////////////////////////////////
     public static float getEarGain()
     {
         try
@@ -236,6 +243,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         }
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     public static float getMicGain()
     {
         if (Receiver.headset > 0 || Receiver.bluetooth > 0)
@@ -262,10 +270,11 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         }
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle _SavedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+        super.onCreate(_SavedInstanceState);
 
         if (Receiver.mContext == null)
             Receiver.mContext = getActivity();
@@ -274,12 +283,14 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         initSummary(getPreferenceScreen());
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     private void reload()
     {
         setPreferenceScreen(null);
         addPreferencesFromResource(R.xml.preferences);
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     private void setDefaultValues()
     {
         for (int i = 0; i < SipdroidEngine.LINES; i++)
@@ -329,11 +340,10 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
             getPreferenceScreen().findPreference(PREF_3G).setEnabled(false);
             getPreferenceScreen().findPreference(PREF_EDGE).setEnabled(false);
         }
-        
-        //updateSummaries();
         Codecs.check();
     }    
 
+    // //////////////////////////////////////////////////////////////////////////////
     public static String getProfileNameString(SharedPreferences s)
     {
         String provider = s.getString(PREF_SERVER, DEFAULT_SERVER);
@@ -345,6 +355,11 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
 
         return s.getString(PREF_USERNAME, DEFAULT_USERNAME) + "@" + provider;
     }
+    
+    // //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Call a DatePicker_DialogFragment and set the Date before Password will be set
+     */
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen _PreferenceScreen, Preference _Preference)
     {
@@ -361,6 +376,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         return super.onPreferenceTreeClick(_PreferenceScreen, _Preference);
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     @Override
     public void onResume()
     {
@@ -368,6 +384,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         super.onResume();
     }
     
+    // //////////////////////////////////////////////////////////////////////////////
     @Override
     public void onPause()
     {
@@ -378,6 +395,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     EditText transferText;
     String   mKey;
 
+    // //////////////////////////////////////////////////////////////////////////////
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
         if (!Thread.currentThread().getName().equals("main"))
@@ -472,6 +490,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         updatePrefSummary(Preference);  
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     void fill(String pref, String def, int val, int disp)
     {
         for (int i = 0; i < getResources().getStringArray(val).length; i++)
@@ -483,6 +502,12 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         }
     }
     
+    // //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Init the summary text
+     * Example: with the current settings -> getPreferenceScreen()
+     * @param _Preference
+     */
     private void initSummary(Preference _Preference)
     {
         if (_Preference instanceof PreferenceGroup)
@@ -499,6 +524,12 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         }
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Update summary depends on preference class
+     * Set Password Display to "*****"
+     * @param _Preference
+     */
     private void updatePrefSummary(Preference _Preference)
     {
         if (_Preference instanceof ListPreference)
@@ -520,6 +551,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
         }
     }
 
+    // //////////////////////////////////////////////////////////////////////////////
     @Override
     public void onClick(DialogInterface arg0, int arg1)
     {

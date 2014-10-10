@@ -20,7 +20,6 @@ import android.util.Log;
  * Class for saving File at the Internal Storage
  * Uses only static methods
  * @author Robert Thieme
- *
  */
 public class StorageFile
 {
@@ -107,7 +106,7 @@ public class StorageFile
     // //////////////////////////////////////////////////////////////////////////////
     /**
      * Save The ValidTime in File and declare until the Sip Password is valid
-     * Important: Must Called before Setting Password because this method delete the Sip Password
+     * Important: Must called before setting password because this method delete the SIP Password
      * @param _ValidTime String as long time ticks 
      */
     public static void saveValidTime(String _ValidTime)
@@ -148,7 +147,7 @@ public class StorageFile
     // //////////////////////////////////////////////////////////////////////////////    
     /**
      * Load the valid time from until the Sip is valid
-     * @return Valid time as long time ticks
+     * @return Valid time as long time ticks or null
      */
     public static long loadValidTime()
     {        

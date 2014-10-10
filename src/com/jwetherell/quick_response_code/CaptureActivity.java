@@ -44,7 +44,6 @@ import android.widget.TextView;
  * 
  * @author Justin Wetherell (phishman3579@gmail.com)
  * @author Robert Thieme (Change for sending Data to MainActivity)
- * 
  */
 public class CaptureActivity extends DecoderActivity
 {

@@ -10,6 +10,12 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.widget.DatePicker;
 
+/**
+ * DialogFragment Class for showing DatePicker for setting the SIP password valid time
+ * after setting Date call TimePicker for setting Date.
+ * Call  setDate of  MainActivity
+ * @author Robert Thieme
+ */
 public class DatePicker_DialogFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener
 {

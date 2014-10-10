@@ -11,6 +11,12 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
+/**
+ * Class for showing TimePicker for setting the SIP password valid time
+ * Call  setTime of  MainActivity
+ * @author Robert Thieme
+ *
+ */
 public class TimePicker_DialogFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener
 {

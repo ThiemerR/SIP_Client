@@ -66,6 +66,14 @@ import com.sip_client.ui.ContactList_Fragment;
 import com.sip_client.ui.Settings_Fragment;
 import com.sip_client.ui.Start_Fragment;
 
+/**
+ * The MainActivity of the Application
+ * Use ViewPager with Tab as layout
+ * Implements some Code of Sipdroid from Sipdroid.java
+ * @author Robert_Thieme
+ * @author Copyright (C) 2009 The Sipdroid Open Source Project
+ * @author Copyright (C) 2008 Hughes Systique Corporation, USA (http://www.hsc.com)
+ */
 public class MainActivity extends Activity implements ActionBar.TabListener, OnDismissListener
 {  
     private static Context m_Context;
@@ -106,6 +114,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         m_Settings_Fragment = new Settings_Fragment();
         
         //Check if Password is valid
+        if ((PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(Settings_Fragment.PREF_PASSWORD, "").equals(""))
+                && !checkIsPasswordValid())
+        {
+            Toast.makeText(this, R.string.pwnotvaild, Toast.LENGTH_LONG).show();
+        }
 
         // Set up the action bar.
         final ActionBar ActionBar = getActionBar();
@@ -132,7 +146,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         });
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < m_SectionsPagerAdapter.getCount(); i++)
+        for (int Index = 0; Index < m_SectionsPagerAdapter.getCount(); Index++)
         {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
@@ -140,10 +154,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
             // this tab is selected.
             ActionBar.addTab(
                     ActionBar.newTab()
-                            .setText(m_SectionsPagerAdapter.getPageTitle(i))
+                            .setText(m_SectionsPagerAdapter.getPageTitle(Index))
                             .setTabListener(this));
         }
     }
+    // ////////////////////////////////////////////////////////////////////////////// 
+    // Sipdroid Methods
+    // ////////////////////////////////////////////////////////////////////////////// 
     
     // ////////////////////////////////////////////////////////////////////////////// 
     @Override
@@ -233,28 +250,29 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
     // //////////////////////////////////////////////////////////////////////////////
     public void call_menu(AutoCompleteTextView _View)
     {
-        if( !(PreferenceManager.getDefaultSharedPreferences(this).getString(Settings_Fragment.PREF_PASSWORD, "").equals(""))
+        if (!(PreferenceManager.getDefaultSharedPreferences(this).getString(Settings_Fragment.PREF_PASSWORD, "")
+                .equals(""))
                 && checkIsPasswordValid())
-        {  
-        String Target = _View.getText().toString();
-        if (m_AlertDlg != null) 
         {
-            m_AlertDlg.cancel();
-        }
-        if (Target.length() == 0)
-            m_AlertDlg = new AlertDialog.Builder(this)
-                .setMessage(R.string.empty)
-                .setTitle(R.string.app_name)
-                .setIcon(R.drawable.icon22)
-                .setCancelable(true)
-                .show();
-        else if (!Receiver.engine(this).call(Target,true))
-            m_AlertDlg = new AlertDialog.Builder(this)
-                .setMessage(R.string.notfast)
-                .setTitle(R.string.app_name)
-                .setIcon(R.drawable.icon22)
-                .setCancelable(true)
-                .show();
+            String Target = _View.getText().toString();
+            if (m_AlertDlg != null)
+            {
+                m_AlertDlg.cancel();
+            }
+            if (Target.length() == 0)
+                m_AlertDlg = new AlertDialog.Builder(this)
+                        .setMessage(R.string.empty)
+                        .setTitle(R.string.app_name)
+                        .setIcon(R.drawable.icon22)
+                        .setCancelable(true)
+                        .show();
+            else if (!Receiver.engine(this).call(Target, true))
+                m_AlertDlg = new AlertDialog.Builder(this)
+                        .setMessage(R.string.notfast)
+                        .setTitle(R.string.app_name)
+                        .setIcon(R.drawable.icon22)
+                        .setCancelable(true)
+                        .show();
         }
         else
         {
@@ -350,6 +368,47 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         onResume();
     }
     
+    // ////////////////////////////////////////////////////////////////////////////// 
+    public static class CallsCursor extends CursorWrapper
+    {
+        List<String> List;
+
+        // ////////////////////////////////////////////////////////////////////////////// 
+        public int getCount()
+        {
+            return List.size();
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////// 
+        public String getString(int i)
+        {
+            return List.get(getPosition());
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////// 
+        public CallsCursor(Cursor _Cursor)
+        {
+            super(_Cursor);
+            List = new ArrayList<String>();
+            for (int i = 0; i < _Cursor.getCount(); i++)
+            {
+                moveToPosition(i);
+                String PhoneNumber = super.getString(1);
+                String CachedName = super.getString(2);
+                if (CachedName != null && CachedName.trim().length() > 0)
+                    PhoneNumber += " <" + CachedName + ">";
+                if (List.contains(PhoneNumber))
+                    continue;
+                List.add(PhoneNumber);
+            }
+            moveToFirst();
+        }
+    }    
+    
+    // ////////////////////////////////////////////////////////////////////////////// 
+    // SIP_Cient Methods
+    // ////////////////////////////////////////////////////////////////////////////// 
+    
     // //////////////////////////////////////////////////////////////////////////////    
     public static Context getContext()
     {
@@ -433,43 +492,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         StorageFile.saveValidTime(ValidTime);        
         m_ValidDareCalender = null;        
     }
-    
-    // ////////////////////////////////////////////////////////////////////////////// 
-    public static class CallsCursor extends CursorWrapper
-    {
-        List<String> List;
-
-        // ////////////////////////////////////////////////////////////////////////////// 
-        public int getCount()
-        {
-            return List.size();
-        }
-
-        // ////////////////////////////////////////////////////////////////////////////// 
-        public String getString(int i)
-        {
-            return List.get(getPosition());
-        }
-
-        // ////////////////////////////////////////////////////////////////////////////// 
-        public CallsCursor(Cursor _Cursor)
-        {
-            super(_Cursor);
-            List = new ArrayList<String>();
-            for (int i = 0; i < _Cursor.getCount(); i++)
-            {
-                moveToPosition(i);
-                String PhoneNumber = super.getString(1);
-                String CachedName = super.getString(2);
-                if (CachedName != null && CachedName.trim().length() > 0)
-                    PhoneNumber += " <" + CachedName + ">";
-                if (List.contains(PhoneNumber))
-                    continue;
-                List.add(PhoneNumber);
-            }
-            moveToFirst();
-        }
-    }    
     
     // //////////////////////////////////////////////////////////////////////////////
     // FragmentPagerAdapter/Tabs Methods Class

@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import com.example.sip_client.R;
 
+/**
+ * Serializable class for saving Contacts in Object file
+ * @author Robert Thieme
+ */
 public class Contact implements Serializable
 {
     private String m_Displayname;

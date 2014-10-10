@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this source code; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * Author Robert Thieme: Edit set LINES to 1
  */
 
 package org.sipdroid.sipua.base;
@@ -49,7 +51,7 @@ import android.preference.PreferenceManager;
 
 public class SipdroidEngine implements RegisterAgentListener {
 
-	public static final int LINES = 2;
+	public static final int LINES = 1;
 	public int pref;
 	
 	public static final int UNINITIALIZED = 0x0;

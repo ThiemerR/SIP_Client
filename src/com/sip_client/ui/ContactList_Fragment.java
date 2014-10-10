@@ -33,15 +33,23 @@ import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+/**
+ * Fragment Class for showing contacts
+ * This Fragments implements two different contact views
+ * The first elements implements expandable ListView with own contacts (HotelExpandableListView)
+ * The second elements implements a ListView of the users phone contacts from content provider (ListViewContacts)
+ * Both ListViews start a call_menu from MainActivity if they are clicked
+ * ListViewContacts will loaded with an AsyncTask
+ * @author Robert Thieme
+ */
 public class ContactList_Fragment extends Fragment
 {
-
     private SimpleCursorAdapter             m_Adapter;
     private ContactListExpandableListAdapter m_HotelContactsAdapter;
     private MatrixCursor                    m_MatrixCursor;   
+    private Cursor                          m_ContactsCursor;
 
     // //////////////////////////////////////////////////////////////////////////////
-
     @Override
     public View onCreateView(LayoutInflater _Inflater, ViewGroup _Container, Bundle _SavedInstanceState)
     {
@@ -60,6 +68,12 @@ public class ContactList_Fragment extends Fragment
     public void onActivityCreated(Bundle _SavedInstanceState)
     {
         super.onActivityCreated(_SavedInstanceState);   
+        
+        //Get the Contact Cursor from Activity to avoid Exception in AsycnTask
+        Uri ContactsUri = ContactsContract.Contacts.CONTENT_URI;
+        // Querying the table ContactsContract.Contacts to retrieve all the contacts
+        m_ContactsCursor = getActivity().getContentResolver().query(ContactsUri, null, null, null,
+                ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
         
         ExpandableListView HotelExpandableListView = (ExpandableListView) getView() .findViewById(R.id.ExpandableListView_HotelContacts);  
         m_HotelContactsAdapter = new ContactListExpandableListAdapter(((MainActivity) getActivity()).loadHotelContactList()
@@ -117,27 +131,23 @@ public class ContactList_Fragment extends Fragment
 
         // Starting the AsyncTask process to retrieve and load listview with contacts
         listViewContactsLoader.execute();
+        
+        
     }
 
     // //////////////////////////////////////////////////////////////////////////////
     /** An AsyncTask class to retrieve and load listview with contacts */
     private class ListViewContactsLoader extends AsyncTask<Void, Void, Cursor>
     {
-
+        // //////////////////////////////////////////////////////////////////////////////
         @Override
         protected Cursor doInBackground(Void... _Params)
         {
-            Uri ContactsUri = ContactsContract.Contacts.CONTENT_URI;
-
-            // Querying the table ContactsContract.Contacts to retrieve all the contacts
-            Cursor ContactsCursor = getActivity().getContentResolver().query(ContactsUri, null, null, null,
-                    ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
-
-            if (ContactsCursor.moveToFirst())
+            if (m_ContactsCursor.moveToFirst())
             {
                 do
                 {
-                    long contactId = ContactsCursor.getLong(ContactsCursor.getColumnIndex("_ID"));
+                    long contactId = m_ContactsCursor.getLong(m_ContactsCursor.getColumnIndex("_ID"));
 
                     Uri dataUri = ContactsContract.Data.CONTENT_URI;
 
@@ -237,16 +247,19 @@ public class ContactList_Fragment extends Fragment
                         });
                     }
                 }
-                while (ContactsCursor.moveToNext());
+                while (m_ContactsCursor.moveToNext());
             }
-            ContactsCursor.close();
+            m_ContactsCursor.close();
             return m_MatrixCursor;
         }
 
+        // //////////////////////////////////////////////////////////////////////////////
+        /**
+         *  Setting the cursor containing contacts to ListView
+         */
         @Override
         protected void onPostExecute(Cursor _Result)
-        {
-            // Setting the cursor containing contacts to listview
+        {            
             m_Adapter.swapCursor(_Result);
         }     
     }   
