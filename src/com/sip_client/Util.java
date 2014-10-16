@@ -15,4 +15,16 @@ public class Util
     
     //Request Code for activity result
     public final static int REQUEST_CODE_QRC = 50;
+    
+    /**
+     * Enumeration for usable WiFiEncryption
+     * Important: If u want add more encryption functions u must do if after the last entry because the position
+     * in the enum is used for the assignment
+     */   
+    public static enum WiFiEncryption 
+    {
+        NONE,
+        WEP,
+        WPA,
+    }
 }

@@ -25,6 +25,7 @@ package com.sip_client.ui;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 
 import org.sipdroid.sipua.base.SipdroidEngine;
 import org.sipdroid.sipua.ui.Receiver;
@@ -38,6 +39,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -67,6 +70,7 @@ import com.sip_client.MainActivity;
 import com.sip_client.MainActivity.CallsCursor;
 import com.sip_client.StorageFile;
 import com.sip_client.Util;
+import com.sip_client.Wifi;
 
 /**
  * Fragment Class include will shown when the Application is started Implements some Code of Sipdroid from Sipdroid.java
@@ -87,7 +91,7 @@ public class Start_Fragment extends Fragment
             Calls._ID,
             Calls.NUMBER,
             Calls.CACHED_NAME
-                                             };
+                                             };  
 
     // //////////////////////////////////////////////////////////////////////////////
     @Override
@@ -419,6 +423,9 @@ public class Start_Fragment extends Fragment
         String ServerPort = null;
         String StunServer = null;
         String StunPort = null;        
+        String SSID = null;
+        String WifiPassword = null;
+        int Encryption = -1;
         String[][] HotelContacts = null;
 
         SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
@@ -449,19 +456,42 @@ public class Start_Fragment extends Fragment
             SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER, StunServer);
             SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER_PORT, StunPort);
         }
-        if (_Payload.contains("/pn"))
+        
+        
+        if(_Payload.contains("ws")) // WIFI setting is using
+        {
+            //TO-DO: Add Multiple WIFI settings
+            _Payload = Parts[1];
+            Parts = _Payload.split("/ws");
+            SSID = Parts[0];
+            if(_Payload.contains("/wp"))
+            {
+                _Payload = Parts[1];
+                Parts = _Payload.split("/wp");
+                WifiPassword = Parts[0];
+            }
+            _Payload = Parts[1];
+            Parts = _Payload.split("/we");
+            Encryption = Integer.parseInt(Parts[0]);            
+            Wifi Wifi = new Wifi(getActivity());
+            //TO-DO: Ask User really delete Network (maybe other network with same SSID already exists)
+            Wifi.removeWifiNetwork(Wifi.seachrWifiNetwork(SSID));        
+            Wifi.addWiFiNetwork( SSID , WifiPassword , Util.WiFiEncryption.values()[Encryption] );
+        }
+        if (_Payload.contains("/pn")) // Hotel Numbers is using
         {
             _Payload = Parts[1];
-            Parts = _Payload.split("/pn");
-            HotelContacts = new String[Parts.length - 1][2];
-            for (int Index = 0; Index < Parts.length - 1; ++Index)
+            Parts = _Payload.split("/nr");
+            HotelContacts = new String[Parts.length][2];
+            for (int Index = 0; Index < Parts.length ; ++Index)
             {
-                String[] NewParts = Parts[Index + 1].split("/nr");
+                String[] NewParts = Parts[Index].split("/pn");
                 HotelContacts[Index][0] = NewParts[0];
                 HotelContacts[Index][1] = NewParts[1];
             }
             ((MainActivity) getActivity()).createNewContactlist(HotelContacts);
         }
+        
         SettingsEditor.putString(Settings_Fragment.PREF_USERNAME, User);
         SettingsEditor.putString(Settings_Fragment.PREF_SERVER, ServerDomain);
         SettingsEditor.putString(Settings_Fragment.PREF_PORT, ServerPort);
@@ -534,6 +564,8 @@ public class Start_Fragment extends Fragment
             }
         }
     }
+    
+    
 
     // //////////////////////////////////////////////////////////////////////////////
     // Sipdorid Code
