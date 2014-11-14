@@ -20,24 +20,22 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.example.sip_client.R;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.Result;
-import com.google.zxing.ResultMetadataType;
-import com.jwetherell.quick_response_code.data.Contents;
-import com.jwetherell.quick_response_code.result.ResultHandler;
-import com.jwetherell.quick_response_code.result.ResultHandlerFactory;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.sip_client.R;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Result;
+import com.google.zxing.ResultMetadataType;
+import com.jwetherell.quick_response_code.result.ResultHandler;
+import com.jwetherell.quick_response_code.result.ResultHandlerFactory;
 
 /**
  * Example Capture Activity.
@@ -57,7 +55,7 @@ public class CaptureActivity extends DecoderActivity
 
     private TextView                             statusView                 = null;
     private View                                 resultView                 = null;
-    private boolean                              inScanMode                 = false;
+    //private boolean                              inScanMode                 = false;
     private String m_Payload = null;
 
     @Override
@@ -70,7 +68,7 @@ public class CaptureActivity extends DecoderActivity
         resultView = findViewById(R.id.result_view);
         statusView = (TextView) findViewById(R.id.status_view);
 
-        inScanMode = false;
+        //inScanMode = false;
     }
 
     @Override
@@ -128,7 +126,7 @@ public class CaptureActivity extends DecoderActivity
 
     protected void showScanner()
     {
-        inScanMode = true;
+        //inScanMode = true;
         resultView.setVisibility(View.GONE);
         statusView.setText(R.string.msg_default_status);
         statusView.setVisibility(View.VISIBLE);
@@ -137,7 +135,7 @@ public class CaptureActivity extends DecoderActivity
 
     protected void showResults()
     {
-        inScanMode = false;
+        //inScanMode = false;
         statusView.setVisibility(View.GONE);
         viewfinderView.setVisibility(View.GONE);
         resultView.setVisibility(View.VISIBLE);

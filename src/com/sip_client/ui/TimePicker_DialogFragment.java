@@ -21,6 +21,7 @@ public class TimePicker_DialogFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener
 {
 
+    boolean m_IsFired = false;
     // //////////////////////////////////////////////////////////////////////////////
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
@@ -38,6 +39,10 @@ public class TimePicker_DialogFragment extends DialogFragment
     // //////////////////////////////////////////////////////////////////////////////
     public void onTimeSet(TimePicker _View, int _HourOfDay, int _Minute)
     {
-        ((MainActivity)getActivity()).setTime(_HourOfDay, _Minute);
+        if(!m_IsFired)
+        {
+            ((MainActivity)getActivity()).setTime(_HourOfDay, _Minute);
+            m_IsFired = true;
+        }
     }
 }

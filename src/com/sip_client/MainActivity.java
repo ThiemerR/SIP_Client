@@ -38,6 +38,7 @@ import org.zoolu.tools.Random;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -49,6 +50,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.CursorWrapper;
+import android.nfc.NfcAdapter;
+import android.os.AsyncTask.Status;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -62,6 +65,7 @@ import android.widget.Toast;
 import com.example.sip_client.R;
 import com.sip_client.contactlist.Contact;
 import com.sip_client.contactlist.ContactList;
+import com.sip_client.ui.Alert_DialogFragment;
 import com.sip_client.ui.ContactList_Fragment;
 import com.sip_client.ui.Settings_Fragment;
 import com.sip_client.ui.Start_Fragment;
@@ -87,7 +91,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
     private Settings_Fragment    m_Settings_Fragment;
     
     //Use for Setting Valid Time
-    private Calendar              m_ValidDareCalender = null; 
+    private Calendar              m_ValidDareCalender = null;
+    
+    private NfcAdapter m_NfcAdapter;
 
     
     // Sipdroid Members
@@ -119,6 +125,22 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
                 && !checkIsPasswordValid())
         {
             Toast.makeText(this, R.string.pwnotvaild, Toast.LENGTH_LONG).show();
+        }
+        
+        //Check is NFC available
+        m_NfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
+        if(m_NfcAdapter == null)
+        {
+            showAlertDialog(getString(R.string.nfcnotavailable), R.string.title_nfcnotavailable);
+           //TO-DO: set a boolean variable to deactivate NFC functionality
+        }        
+        
+        //Check is NFC enable
+        if(!m_NfcAdapter.isEnabled())
+        {
+            showAlertDialog(getString(R.string.nfcnotenable), R.string.title_nfcnotenable);
+            //TO-DO: if NFC is not not enable, ask user for enabling
+            //startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS)); need API 16 target is 14
         }
 
         // Set up the action bar.
@@ -415,6 +437,19 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         return m_Context;
     }
     
+    // ////////////////////////////////////////////////////////////////////////////// 
+    @Override
+    protected void onDestroy()
+    {        
+        //Check if AsyncTask are running when Activity is destroyed, if yes then break the AsyncTask
+        if( m_ContactList_Fragment.m_ListViewContactsLoader != null &&  
+                m_ContactList_Fragment.m_ListViewContactsLoader.getStatus() == Status.RUNNING)
+        {
+            m_ContactList_Fragment.m_ListViewContactsLoader.cancel(true);
+        }           
+        super.onDestroy();
+    }
+    
     
     // ////////////////////////////////////////////////////////////////////////////// 
     /**
@@ -491,6 +526,19 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         String ValidTime = String.valueOf(m_ValidDareCalender.getTimeInMillis());
         StorageFile.saveValidTime(ValidTime);        
         m_ValidDareCalender = null;        
+    }
+    
+    // //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Show Alert_DialogFragment
+     * @param _Message Message of the Alert Dialog
+     * @param _Title Title from Resource of the Alert Dialog
+     */
+    public void showAlertDialog(String _Message, int _Title) 
+    {
+        DialogFragment NewFragment = Alert_DialogFragment.newInstance(
+                _Title, _Message);
+        NewFragment.show(getFragmentManager(), "alertdialog");
     }
     
     // //////////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,6 @@ package com.sip_client.ui;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
 
 import org.sipdroid.sipua.base.SipdroidEngine;
 import org.sipdroid.sipua.ui.Receiver;
@@ -39,8 +38,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -81,9 +78,6 @@ import com.sip_client.Wifi;
  */
 public class Start_Fragment extends Fragment
 {
-    private NfcAdapter            m_NfcAdapter;
-    public TextView               m_StatusTextView;
-
     // Sipdroid Members
     private AutoCompleteTextView  m_Sip_uri_box;
     private static final String[] PROJECTION = new String[]
@@ -98,6 +92,14 @@ public class Start_Fragment extends Fragment
     public void onCreate(Bundle _SavedInstanceState)
     {
         super.onCreate(_SavedInstanceState);
+        
+        //Use after AAR is called
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction()))
+        {
+            // get NDEF message from intent
+            NdefMessage[] NdefMessages = getNdefMessages(getActivity().getIntent());
+            processNdef_RTD_TEXT(NdefMessages[0], 0);
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -118,27 +120,8 @@ public class Start_Fragment extends Fragment
     @Override
     public void onActivityCreated(Bundle _SavedInstanceState)
     {
-        super.onActivityCreated(_SavedInstanceState);
-        m_StatusTextView = (TextView) getView().findViewById(R.id.StatusTextView);
+        super.onActivityCreated(_SavedInstanceState);  
         
-        //Check is NFC enable
-        m_NfcAdapter = NfcAdapter.getDefaultAdapter(getActivity().getApplicationContext());
-        if (m_NfcAdapter == null)
-        {
-            m_StatusTextView.setText("NFC is not available for the device!!!");
-        }
-        else
-        {
-            m_StatusTextView.setText("NFC is available for the device");
-        }
-
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction()))
-        {
-            // get NDEF message from intent
-            NdefMessage[] NdefMessages = getNdefMessages(getActivity().getIntent());
-            processNdef_RTD_TEXT(NdefMessages[0], 0);
-        }
-
         Button SearchQRCButton = (Button) getView().findViewById(R.id.ButtonSearchQRC);
         SearchQRCButton.setOnClickListener(new OnClickListener()
         {
@@ -431,61 +414,60 @@ public class Start_Fragment extends Fragment
         SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
         SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, false); // Set Stun Default to false
         SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol
-        Parts = _Payload.split("/us");
+        Parts = _Payload.split(Util.SEPERATOR_USERNAME);
         User = Parts[0];
         _Payload = Parts[1];
-        Parts = _Payload.split("/sd");
+        Parts = _Payload.split(Util.SEPERATOR_SERVERDOMAIN);
         ServerDomain = Parts[0];
         _Payload = Parts[1];
-        Parts = _Payload.split("/po");
+        Parts = _Payload.split(Util.SEPERATOR_SERVERPORT);
         ServerPort = Parts[0];
-        if (_Payload.contains("/is"))// Stun is using
+        if (_Payload.contains(Util.SEPERATOR_USESTUNSERVER))// Stun is using
         {
             _Payload = Parts[1];
-            Parts = _Payload.split("/is");
+            Parts = _Payload.split(Util.SEPERATOR_USESTUNSERVER);
             IsStunUse = Parts[0];
             _Payload = Parts[1];
-            Parts = _Payload.split("/ss");
+            Parts = _Payload.split(Util.SEPERATOR_STUNSERVER);
             StunServer = Parts[0];
             _Payload = Parts[1];
-            Parts = _Payload.split("/sp");
+            Parts = _Payload.split(Util.SEPERATOR_STUNPORT);
             StunPort = Parts[0];
-            //TO-DO Check value of IsStunUse and change IsStunUseBoolean if necessary
+            //TO-DO: Check value of IsStunUse and change IsStunUseBoolean if necessary
             boolean IsStunUseBoolean = IsStunUse.equals("0") ? false : true;
             SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, IsStunUseBoolean);
             SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER, StunServer);
             SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER_PORT, StunPort);
-        }
+        }        
         
-        
-        if(_Payload.contains("ws")) // WIFI setting is using
+        if(_Payload.contains(Util.SEPERATOR_SSID)) // WIFI setting is using
         {
             //TO-DO: Add Multiple WIFI settings
             _Payload = Parts[1];
-            Parts = _Payload.split("/ws");
+            Parts = _Payload.split(Util.SEPERATOR_SSID);
             SSID = Parts[0];
-            if(_Payload.contains("/wp"))
+            if(_Payload.contains(Util.SEPERATOR_WIFIPASSWORD))
             {
                 _Payload = Parts[1];
-                Parts = _Payload.split("/wp");
+                Parts = _Payload.split(Util.SEPERATOR_WIFIPASSWORD);
                 WifiPassword = Parts[0];
             }
             _Payload = Parts[1];
-            Parts = _Payload.split("/we");
+            Parts = _Payload.split(Util.SEPERATOR_WIFIENCRYPTION);
             Encryption = Integer.parseInt(Parts[0]);            
             Wifi Wifi = new Wifi(getActivity());
             //TO-DO: Ask User really delete Network (maybe other network with same SSID already exists)
             Wifi.removeWifiNetwork(Wifi.seachrWifiNetwork(SSID));        
             Wifi.addWiFiNetwork( SSID , WifiPassword , Util.WiFiEncryption.values()[Encryption] );
         }
-        if (_Payload.contains("/pn")) // Hotel Numbers is using
+        if (_Payload.contains(Util.SEPERATOR_PHONENAME)) // Hotel Numbers is using
         {
             _Payload = Parts[1];
-            Parts = _Payload.split("/nr");
+            Parts = _Payload.split(Util.SEPERATOR_PHONENUMBER);
             HotelContacts = new String[Parts.length][2];
             for (int Index = 0; Index < Parts.length ; ++Index)
             {
-                String[] NewParts = Parts[Index].split("/pn");
+                String[] NewParts = Parts[Index].split(Util.SEPERATOR_PHONENAME);
                 HotelContacts[Index][0] = NewParts[0];
                 HotelContacts[Index][1] = NewParts[1];
             }
@@ -516,10 +498,10 @@ public class Start_Fragment extends Fragment
         String Password = null;
         String ValidTime = null;
 
-        Parts = Payload.split("/pw");
+        Parts = Payload.split(Util.SEPERATOR_SIPPASSWORD);
         Password = Parts[0];
         Payload = Parts[1];
-        Parts = Payload.split("/vt");
+        Parts = Payload.split(Util.SEPERATOR_VALIDTIME);
         ValidTime = Parts[0];
 
         StorageFile.saveValidTime(ValidTime);
@@ -543,26 +525,26 @@ public class Start_Fragment extends Fragment
      */
     public void processNdef_RTD_URI(NdefMessage _Ndefmessages)
     {
-        String Payload = null;
-        if (m_StatusTextView != null)
-        {
-            m_StatusTextView.append("RTF_URI_Message \n");
-            for (int j = 0; j < _Ndefmessages.getRecords().length; j++)
-            {
-                NdefRecord Record = _Ndefmessages.getRecords()[j];
-                m_StatusTextView.append((j + 1) + "th. Record Tnf: " + Record.getTnf() + "\n");
-                m_StatusTextView.append((j + 1) + "th. Record type: " +
-                        new String(Record.getType()) + "\n");
-                m_StatusTextView.append((j + 1) + "th. Record id: " +
-                        new String(Record.getId()) + "\n");
-                Payload = new String(Record.getPayload(), 1,
-                        Record.getPayload().length - 1, Charset.forName("UTF-8"));
-                m_StatusTextView.append((j + 1) + "th. Record payload: " + Payload + "\n");
-                byte payloadHeader = Record.getPayload()[0];
-                m_StatusTextView.append((j + 1) + "th. Record payload header: " +
-                        payloadHeader + "\n");
-            }
-        }
+//        String Payload = null;
+//        if (m_StatusTextView != null)
+//        {
+//            m_StatusTextView.append("RTF_URI_Message \n");
+//            for (int j = 0; j < _Ndefmessages.getRecords().length; j++)
+//            {
+//                NdefRecord Record = _Ndefmessages.getRecords()[j];
+//                m_StatusTextView.append((j + 1) + "th. Record Tnf: " + Record.getTnf() + "\n");
+//                m_StatusTextView.append((j + 1) + "th. Record type: " +
+//                        new String(Record.getType()) + "\n");
+//                m_StatusTextView.append((j + 1) + "th. Record id: " +
+//                        new String(Record.getId()) + "\n");
+//                Payload = new String(Record.getPayload(), 1,
+//                        Record.getPayload().length - 1, Charset.forName("UTF-8"));
+//                m_StatusTextView.append((j + 1) + "th. Record payload: " + Payload + "\n");
+//                byte payloadHeader = Record.getPayload()[0];
+//                m_StatusTextView.append((j + 1) + "th. Record payload header: " +
+//                        payloadHeader + "\n");
+//            }
+//        }
     }
     
     

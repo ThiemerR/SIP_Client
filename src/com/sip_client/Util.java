@@ -2,8 +2,7 @@ package com.sip_client;
 
 /**
  * Utilities for the Application
- * 
- * @author Robert Thieme *
+ * @author Robert Thieme
  */
 public class Util
 {
@@ -14,7 +13,25 @@ public class Util
     public final static byte[]   ID_SEND_PW =  { 0x01,  };
     
     //Request Code for activity result
-    public final static int REQUEST_CODE_QRC = 50;
+    public final static int REQUEST_CODE_QRC = 50;    
+    
+    // ////////////////////////////////////////////////////////////////////////////// 
+    //Separator for the Payload
+    // //////////////////////////////////////////////////////////////////////////////     
+    public final static String SEPERATOR_USERNAME = "/us";
+    public final static String SEPERATOR_SERVERDOMAIN = "/sd" ; 
+    public final static String SEPERATOR_SERVERPORT =  "/po" ;
+    public final static String SEPERATOR_USESTUNSERVER = "/is" ; 
+    public final static String SEPERATOR_STUNSERVER = "/ss" ; 
+    public final static String SEPERATOR_STUNPORT =  "/sp" ; 
+    public final static String SEPERATOR_SIPPASSWORD =  "/pw" ;
+    public final static String SEPERATOR_VALIDTIME =  "/vt" ;
+    public final static String SEPERATOR_PHONENAME =  "/pn" ; 
+    public final static String SEPERATOR_PHONENUMBER =  "/pd" ; 
+    public final static String SEPERATOR_SSID =  "/ws" ; 
+    public final static String SEPERATOR_WIFIPASSWORD = "/wp" ; 
+    public final static String SEPERATOR_WIFIENCRYPTION =  "/we" ; 
+    
     
     /**
      * Enumeration for usable WiFiEncryption

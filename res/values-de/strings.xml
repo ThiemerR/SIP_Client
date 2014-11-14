@@ -31,7 +31,10 @@
 <string name="pstn_name">Telefon-Anruf</string>
 <string name="sip_name">Sipdroid-Anruf, wenn verfügbar</string>
 
-<string name="about">Sipdroid ist ein freier SIP-Client für Android
+<string name="about">Diese Applikation verwendet Quellcode vom  Open-Source-Projekt Sipdroid.
+\nDer Quellcode dieser Applikation ist verfügbar auf: https://github.com/ThiemerR/SIP_Client.
+\n
+\nSipdroid ist ein freier SIP-Client für Android
 \n
 \nSiehe http://sipdroid.org für weitere Infos
 \n

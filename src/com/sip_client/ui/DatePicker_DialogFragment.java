@@ -19,7 +19,7 @@ import android.widget.DatePicker;
 public class DatePicker_DialogFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener
 {
-    
+    boolean m_IsFired = false;
     // //////////////////////////////////////////////////////////////////////////////
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
@@ -37,9 +37,13 @@ public class DatePicker_DialogFragment extends DialogFragment
     // //////////////////////////////////////////////////////////////////////////////
     public void onDateSet(DatePicker _View, int _Year, int _Month, int _Day)
     {
-        ((MainActivity)getActivity()).setDate(_Year, _Month, _Day);
-        TimePicker_DialogFragment TimePicker_DialogFragment = new TimePicker_DialogFragment();        
-        TimePicker_DialogFragment.show(getFragmentManager(), "TimePicker");
+        if(!m_IsFired)
+        {
+            ((MainActivity)getActivity()).setDate(_Year, _Month, _Day);
+            TimePicker_DialogFragment TimePicker_DialogFragment = new TimePicker_DialogFragment();        
+            TimePicker_DialogFragment.show(getFragmentManager(), "TimePicker");
+            m_IsFired = true;
+        }
     }
 }
 

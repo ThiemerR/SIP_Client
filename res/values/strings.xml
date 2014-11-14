@@ -32,7 +32,9 @@
 <string name="pstn_name">Phone Call</string>
 <string name="sip_name">Sipdroid Call, when available</string>
 
-<string name="about">This application uses source code of Sipdroid an open-source SIP client for Android
+<string name="about">
+\nThis application uses source code of Sipdroid an open-source SIP client for Android.
+\nThe Source Code of this Application is available at https://github.com/ThiemerR/SIP_Client.
 \n
 \nSee http://sipdroid.org for more info
 \n
@@ -374,13 +376,19 @@
 <string name="title_section1">Phone</string>
 <string name="title_section2">Contactlist</string>
 <string name="title_section3">Settings</string>
+<string name="title_nfcnotavailable">NFC availability</string>
+<string name="title_nfcnotenable">NFC Status</string>
+
 <string name="HotelListviewName">Hotel Phonenumbers</string>
 
 <string name="nfcnodidfound">Don`t found valid NFC ID for this Application</string>
 <string name="setsipaccount">Settings available for the SIP User/Number:&#160;</string>
 <string name="setsippassword">Set new Password</string>
 <string name="pwnotvaild">The password is not valid. Please get it from the SIP_Server App or authorized Administrator</string>
+<string name="nfcnotavailable">NFC is for your Device not available</string>
+<string name="nfcnotenable">NFC is not enable. Please enable it if you want get SIP account information over NFC.</string>
 
 <string name="searchqrcode">Search QR-Code</string>
+<string name="ok">OK</string>
 
 </resources>

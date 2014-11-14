@@ -3,35 +3,29 @@ package com.sip_client.ui;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import com.example.sip_client.R;
-import com.sip_client.MainActivity;
-import com.sip_client.contactlist.Contact;
-import com.sip_client.contactlist.ContactListExpandableListAdapter;
-
-import android.R.string;
 import android.app.Fragment;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ImageView;
 import android.widget.ListView;
+
+import com.example.sip_client.R;
+import com.sip_client.MainActivity;
+import com.sip_client.contactlist.Contact;
+import com.sip_client.contactlist.ContactListExpandableListAdapter;
 
 /**
  * Fragment Class for showing contacts
@@ -48,6 +42,8 @@ public class ContactList_Fragment extends Fragment
     private ContactListExpandableListAdapter m_HotelContactsAdapter;
     private MatrixCursor                    m_MatrixCursor;   
     private Cursor                          m_ContactsCursor;
+    
+    public ListViewContactsLoader m_ListViewContactsLoader;
 
     // //////////////////////////////////////////////////////////////////////////////
     @Override
@@ -127,17 +123,15 @@ public class ContactList_Fragment extends Fragment
         });        
 
         // Creating an AsyncTask object to retrieve and load listview with contacts
-        ListViewContactsLoader listViewContactsLoader = new ListViewContactsLoader();
+        m_ListViewContactsLoader = new ListViewContactsLoader();
 
         // Starting the AsyncTask process to retrieve and load listview with contacts
-        listViewContactsLoader.execute();
-        
-        
+        m_ListViewContactsLoader.execute();   
     }
 
     // //////////////////////////////////////////////////////////////////////////////
     /** An AsyncTask class to retrieve and load listview with contacts */
-    private class ListViewContactsLoader extends AsyncTask<Void, Void, Cursor>
+    public class ListViewContactsLoader extends AsyncTask<Void, Void, Cursor>
     {
         // //////////////////////////////////////////////////////////////////////////////
         @Override

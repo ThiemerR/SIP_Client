@@ -23,7 +23,6 @@
 package com.sip_client.ui;
 
 import org.sipdroid.codecs.Codecs;
-import org.sipdroid.media.RtpStreamReceiver;
 import org.sipdroid.sipua.base.SipdroidEngine;
 import org.sipdroid.sipua.ui.Checkin;
 import org.sipdroid.sipua.ui.InstantAutoCompleteTextView;
@@ -36,7 +35,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;

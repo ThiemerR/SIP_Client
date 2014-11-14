@@ -38,10 +38,19 @@ public class Wifi
                 HotelWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
                 break;
             case WEP:
-                HotelWifiConfiguration.wepKeys[0] = _WifiPassword ; 
+                //if password in hex dont use quotes
+                if(_WifiPassword.length() == 5 || _WifiPassword.length() == 13)
+                {
+                    HotelWifiConfiguration.wepKeys[0] = "\"" + _WifiPassword + "\""; 
+                }
+                else
+                {
+                    HotelWifiConfiguration.wepKeys[0] = _WifiPassword ; 
+                }
                 HotelWifiConfiguration.wepTxKeyIndex = 0;
                 HotelWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                HotelWifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);                        
+                HotelWifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);      
+                HotelWifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104); 
                 break;            
             case WPA:
                 HotelWifiConfiguration.preSharedKey = "\""+ _WifiPassword +"\"";

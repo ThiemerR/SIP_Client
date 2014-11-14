@@ -2,19 +2,18 @@ package com.sip_client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.sip_client.contactlist.ContactList;
-import com.sip_client.ui.Settings_Fragment;
-
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.sip_client.contactlist.ContactList;
+import com.sip_client.ui.Settings_Fragment;
 
 /**
  * Class for saving File at the Internal Storage
