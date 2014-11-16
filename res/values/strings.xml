@@ -386,7 +386,7 @@
 <string name="setsippassword">Set new Password</string>
 <string name="pwnotvaild">The password is not valid. Please get it from the SIP_Server App or authorized Administrator</string>
 <string name="nfcnotavailable">NFC is for your Device not available</string>
-<string name="nfcnotenable">NFC is not enable. Please enable it if you want get SIP account information over NFC.</string>
+<string name="nfcnotenable">NFC is not enable. Please enable it if you want writing to a NFC-TAG or sending over NFC.</string>
 
 <string name="searchqrcode">Search QR-Code</string>
 <string name="ok">OK</string>

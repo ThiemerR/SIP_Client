@@ -414,6 +414,8 @@ public class Start_Fragment extends Fragment
         SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
         SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, false); // Set Stun Default to false
         SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol
+        //Replace "|" with "/" because the split method dont work with "|" 
+        _Payload = _Payload.replace(Util.SERVER_START_SEPERATOR_SIGN, "/");        
         Parts = _Payload.split(Util.SEPERATOR_USERNAME);
         User = Parts[0];
         _Payload = Parts[1];
@@ -459,17 +461,19 @@ public class Start_Fragment extends Fragment
             //TO-DO: Ask User really delete Network (maybe other network with same SSID already exists)
             Wifi.removeWifiNetwork(Wifi.seachrWifiNetwork(SSID));        
             Wifi.addWiFiNetwork( SSID , WifiPassword , Util.WiFiEncryption.values()[Encryption] );
-        }
-        if (_Payload.contains(Util.SEPERATOR_PHONENAME)) // Hotel Numbers is using
+        }        
+        // Important: should always be use as as last Entry in Paylaod or u must change the algorithm at the Server App and the Seperator in Util.java
+        if (_Payload.contains(Util.SEPERATOR_PHONENUMBER)) // Hotel Numbers is using
         {
             _Payload = Parts[1];
             Parts = _Payload.split(Util.SEPERATOR_PHONENUMBER);
-            HotelContacts = new String[Parts.length][2];
-            for (int Index = 0; Index < Parts.length ; ++Index)
+            HotelContacts = new String[Parts.length / 2][2];
+            int ContactIndex = 0;
+            for (int Index = 0; Index < Parts.length ; Index +=2)
             {
-                String[] NewParts = Parts[Index].split(Util.SEPERATOR_PHONENAME);
-                HotelContacts[Index][0] = NewParts[0];
-                HotelContacts[Index][1] = NewParts[1];
+                HotelContacts[ContactIndex][0] = Parts[Index];
+                HotelContacts[ContactIndex][1] = Parts[Index +1];
+                ContactIndex++;
             }
             ((MainActivity) getActivity()).createNewContactlist(HotelContacts);
         }

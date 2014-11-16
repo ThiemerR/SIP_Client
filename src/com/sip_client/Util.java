@@ -18,6 +18,8 @@ public class Util
     // ////////////////////////////////////////////////////////////////////////////// 
     //Separator for the Payload
     // //////////////////////////////////////////////////////////////////////////////     
+    public final static String SERVER_START_SEPERATOR_SIGN = "|"; 
+    
     public final static String SEPERATOR_USERNAME = "/us";
     public final static String SEPERATOR_SERVERDOMAIN = "/sd" ; 
     public final static String SEPERATOR_SERVERPORT =  "/po" ;
@@ -26,8 +28,7 @@ public class Util
     public final static String SEPERATOR_STUNPORT =  "/sp" ; 
     public final static String SEPERATOR_SIPPASSWORD =  "/pw" ;
     public final static String SEPERATOR_VALIDTIME =  "/vt" ;
-    public final static String SEPERATOR_PHONENAME =  "/pn" ; 
-    public final static String SEPERATOR_PHONENUMBER =  "/pd" ; 
+    public final static String SEPERATOR_PHONENUMBER =  "/" ; 
     public final static String SEPERATOR_SSID =  "/ws" ; 
     public final static String SEPERATOR_WIFIPASSWORD = "/wp" ; 
     public final static String SEPERATOR_WIFIENCRYPTION =  "/we" ; 
