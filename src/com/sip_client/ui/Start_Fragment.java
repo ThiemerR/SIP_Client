@@ -359,8 +359,7 @@ public class Start_Fragment extends Fragment
 
         int isUTF8 = StatusByte - languageCodeLength;
         if (isUTF8 == 0x00)
-        {
-            //m_StatusTextView.append((_Index + 1) + "th. Record is UTF-8\n");
+        {           
             Payload = new String(NdefRecord.getPayload(), 1 + languageCodeLength,
                     NdefRecord.getPayload().length - 1 - languageCodeLength,
                     Charset.forName("UTF-8"));
@@ -372,8 +371,9 @@ public class Start_Fragment extends Fragment
                     NdefRecord.getPayload().length - 1 - languageCodeLength,
                     Charset.forName("UTF-16"));
         }
-
-        //m_StatusTextView.append((_Index + 1) + "th. Record payload: " + Payload + "\n");
+        
+        //Replace "|" with "/" because the split method dont work with "|" 
+        Payload = Payload.replace(Util.SERVER_START_SEPERATOR_SIGN, "/"); 
 
         if (Arrays.equals(NFC_SEND_ID, Util.ID_SEND_ALL))
         {
@@ -413,9 +413,7 @@ public class Start_Fragment extends Fragment
 
         SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
         SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, false); // Set Stun Default to false
-        SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol
-        //Replace "|" with "/" because the split method dont work with "|" 
-        _Payload = _Payload.replace(Util.SERVER_START_SEPERATOR_SIGN, "/");        
+        SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol               
         Parts = _Payload.split(Util.SEPERATOR_USERNAME);
         User = Parts[0];
         _Payload = Parts[1];
