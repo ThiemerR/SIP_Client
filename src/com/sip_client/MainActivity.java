@@ -117,15 +117,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
         m_Context = this;        
         m_Start_Fragment = new Start_Fragment();
         m_ContactList_Fragment = new ContactList_Fragment();
-        m_Settings_Fragment = new Settings_Fragment();
-        
-        //Check if Password is valid
-        if ((PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(Settings_Fragment.PREF_PASSWORD, "").equals(""))
-                && !checkIsPasswordValid())
-        {
-            Toast.makeText(this, R.string.pwnotvaild, Toast.LENGTH_LONG).show();
-        }
+        m_Settings_Fragment = new Settings_Fragment();  
         
         //Check is NFC available
         m_NfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
@@ -207,6 +199,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
                 (Checkin.createButton == 0 || Random.nextInt(Checkin.createButton) != 0))
         {
             Text = null;        
+        }
+        
+        //Check if Password is valid
+        if ((PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(Settings_Fragment.PREF_PASSWORD, "").equals(""))
+                && !checkIsPasswordValid())
+        {
+            Toast.makeText(this, R.string.pwnotvaild, Toast.LENGTH_LONG).show();
         }
     }
     
@@ -304,8 +304,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnD
     
     // //////////////////////////////////////////////////////////////////////////////
     public void call_menu(String _Number)
-    {        
-        
+    {                
         if( !(PreferenceManager.getDefaultSharedPreferences(this).getString(Settings_Fragment.PREF_PASSWORD, "").equals(""))
                 && checkIsPasswordValid())
         {        

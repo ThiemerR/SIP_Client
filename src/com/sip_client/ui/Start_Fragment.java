@@ -78,6 +78,7 @@ import com.sip_client.Wifi;
  */
 public class Start_Fragment extends Fragment
 {
+    private final static String LOG_TAG = "Start_Fragment";
     // Sipdroid Members
     private AutoCompleteTextView  m_Sip_uri_box;
     private static final String[] PROJECTION = new String[]
@@ -287,10 +288,12 @@ public class Start_Fragment extends Fragment
         Bundle Extras = _Data.getExtras();
         if (_RequestCode == Util.REQUEST_CODE_QRC && _ResultCode == Activity.RESULT_OK)
         {
+          
             String Payload = Extras.getString("Payload");
+            Log.i(LOG_TAG, "Got SIP-Data over QR-code");
             if (Payload != null)
-            {
-                setSipPreferences(Payload);
+            {                
+                setSipPreferencesWithoutPw(Payload);                
             }
         }
         super.onActivityResult(_RequestCode, _ResultCode, _Data);
@@ -370,18 +373,21 @@ public class Start_Fragment extends Fragment
             Payload = new String(NdefRecord.getPayload(), 1 + languageCodeLength,
                     NdefRecord.getPayload().length - 1 - languageCodeLength,
                     Charset.forName("UTF-16"));
-        }
-        
-        //Replace "|" with "/" because the split method dont work with "|" 
-        Payload = Payload.replace(Util.SERVER_START_SEPERATOR_SIGN, "/"); 
+        }        
 
         if (Arrays.equals(NFC_SEND_ID, Util.ID_SEND_ALL))
         {
             setSipPreferences(Payload);
         }
+        else if (Arrays.equals(NFC_SEND_ID, Util.ID_SEND_ALL_WITHOUT_PW))
+        {
+            setSipPreferencesWithoutPw(Payload);
+            Log.i(LOG_TAG, "Process SIP-Data without PWj over NFC");
+        }
         else if (Arrays.equals(NFC_SEND_ID, Util.ID_SEND_PW))
         {
             setSipPasswordPreferences(Payload);
+            Log.i(LOG_TAG, "Process SIP-Data over NFC");
         }
         else
         {
@@ -396,10 +402,15 @@ public class Start_Fragment extends Fragment
      * The formation of the Payload String depends on SIP_Server
      * @param _Payload specialized String from SIP_Server Application     
      */
-    private void setSipPreferences(String _Payload)
+    private void setSipPreferencesWithoutPw(String _Payload)
     {
         Editor SettingsEditor = null;
         String[] Parts = null;
+        String[] Parts2 = null;
+        String SipData = null;
+        String StunData = null;
+        String WlanData = null;        
+        
         String User = null;
         String ServerDomain = null;
         String IsStunUse = null;
@@ -413,58 +424,56 @@ public class Start_Fragment extends Fragment
 
         SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
         SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, false); // Set Stun Default to false
-        SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol               
-        Parts = _Payload.split(Util.SEPERATOR_USERNAME);
-        User = Parts[0];
-        _Payload = Parts[1];
-        Parts = _Payload.split(Util.SEPERATOR_SERVERDOMAIN);
-        ServerDomain = Parts[0];
-        _Payload = Parts[1];
-        Parts = _Payload.split(Util.SEPERATOR_SERVERPORT);
-        ServerPort = Parts[0];
-        if (_Payload.contains(Util.SEPERATOR_USESTUNSERVER))// Stun is using
+        SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol
+        
+        //Process Sip-data
+        Parts = _Payload.split(Util.SEPERATOR_ENDSIPDATA);
+        SipData = Parts[0];
+        Parts2 = SipData.split(Util.STANDARD_SEPERATOR_SIGN);  
+        User = Parts2[0];
+        ServerDomain = Parts2[1];
+        ServerPort = Parts2[2];
+        
+        if(_Payload.contains(Util.SEPERATOR_ENDSTUNSERVER.replace("\\", "")))// Stun is using
         {
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_USESTUNSERVER);
-            IsStunUse = Parts[0];
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_STUNSERVER);
-            StunServer = Parts[0];
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_STUNPORT);
-            StunPort = Parts[0];
+            Parts = Parts[1].split(Util.SEPERATOR_ENDSTUNSERVER);
+            StunData = Parts[0];
+            Parts2 = StunData.split(Util.STANDARD_SEPERATOR_SIGN); 
+            IsStunUse = Parts2[0];
+            StunServer = Parts2[1];
+            StunPort = Parts2[2];
             //TO-DO: Check value of IsStunUse and change IsStunUseBoolean if necessary
             boolean IsStunUseBoolean = IsStunUse.equals("0") ? false : true;
             SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, IsStunUseBoolean);
             SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER, StunServer);
-            SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER_PORT, StunPort);
-        }        
+            SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER_PORT, StunPort);            
+        }
         
-        if(_Payload.contains(Util.SEPERATOR_SSID)) // WIFI setting is using
+        if(_Payload.contains(Util.SEPERATOR_ENDWLAN.replace("\\", ""))) // WIFI setting is using
         {
             //TO-DO: Add Multiple WIFI settings
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_SSID);
-            SSID = Parts[0];
-            if(_Payload.contains(Util.SEPERATOR_WIFIPASSWORD))
-            {
-                _Payload = Parts[1];
-                Parts = _Payload.split(Util.SEPERATOR_WIFIPASSWORD);
-                WifiPassword = Parts[0];
-            }
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_WIFIENCRYPTION);
-            Encryption = Integer.parseInt(Parts[0]);            
+            Parts = Parts[1].split(Util.SEPERATOR_ENDWLAN);
+            WlanData = Parts[0];
+            Parts2 = WlanData.split(Util.STANDARD_SEPERATOR_SIGN); 
+            SSID = Parts2[0];
+            Encryption = Integer.parseInt(Parts2[1]);             
+        }
+        
+        if(_Payload.contains(Util.SEPERATOR_ENDWLANPASSWORD.replace("\\", ""))) // WIFI suse encryption with pw
+        {
+            Parts = Parts[1].split(Util.SEPERATOR_ENDWLANPASSWORD);
+            WifiPassword = Parts[0];
+        }
+        if(SSID != null) //Add WLAN
+        {
             Wifi Wifi = new Wifi(getActivity());
             //TO-DO: Ask User really delete Network (maybe other network with same SSID already exists)
             Wifi.removeWifiNetwork(Wifi.seachrWifiNetwork(SSID));        
             Wifi.addWiFiNetwork( SSID , WifiPassword , Util.WiFiEncryption.values()[Encryption] );
-        }        
-        // Important: should always be use as as last Entry in Paylaod or u must change the algorithm at the Server App and the Seperator in Util.java
-        if (_Payload.contains(Util.SEPERATOR_PHONENUMBER)) // Hotel Numbers is using
-        {
-            _Payload = Parts[1];
-            Parts = _Payload.split(Util.SEPERATOR_PHONENUMBER);
+        }
+        if(Parts.length > 1) // Hotel Numbers is using
+        {            
+            Parts = Parts[1].split(Util.STANDARD_SEPERATOR_SIGN);
             HotelContacts = new String[Parts.length / 2][2];
             int ContactIndex = 0;
             for (int Index = 0; Index < Parts.length ; Index +=2)
@@ -483,6 +492,7 @@ public class Start_Fragment extends Fragment
         // Restart the Engine
         Receiver.engine(getActivity()).halt();
         Receiver.engine(getActivity()).StartEngine();
+        Log.i(LOG_TAG, "Process SIP-Data");
         Toast.makeText(getActivity(), getString(R.string.setsipaccount) + User, Toast.LENGTH_SHORT).show();
     }
 
@@ -500,11 +510,9 @@ public class Start_Fragment extends Fragment
         String Password = null;
         String ValidTime = null;
 
-        Parts = Payload.split(Util.SEPERATOR_SIPPASSWORD);
+        Parts = Payload.split(Util.STANDARD_SEPERATOR_SIGN);
         Password = Parts[0];
-        Payload = Parts[1];
-        Parts = Payload.split(Util.SEPERATOR_VALIDTIME);
-        ValidTime = Parts[0];
+        ValidTime = Parts[1];
 
         StorageFile.saveValidTime(ValidTime);
         
@@ -515,6 +523,113 @@ public class Start_Fragment extends Fragment
         Receiver.engine(getActivity()).halt();
         Receiver.engine(getActivity()).StartEngine();
         Toast.makeText(getActivity(), R.string.setsippassword, Toast.LENGTH_SHORT).show();
+    }
+    
+    // //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Set different preference settings from the Payload
+     * Use this Method if NDEF Record Message has the ID of Util.ID_SEND_ALL
+     * The formation of the Payload String depends on SIP_Server
+     * @param _Payload specialized String from SIP_Server Application     
+     */
+    private void setSipPreferences(String _Payload)
+    {
+        Editor SettingsEditor = null;
+        String[] Parts = null;
+        String[] Parts2 = null;
+        String SipData = null;
+        String StunData = null;
+        String WlanData = null;        
+        
+        String User = null;
+        String ServerDomain = null;
+        String ServerPort = null;
+        String Password = null;
+        String ValidTime = null;
+        String IsStunUse = null;
+        String StunServer = null;
+        String StunPort = null;        
+        String SSID = null;
+        String WifiPassword = null;
+        int Encryption = -1;
+        String[][] HotelContacts = null;
+
+        SettingsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, false); // Set Stun Default to false
+        SettingsEditor.putString(Settings_Fragment.PREF_PROTOCOL, Settings_Fragment.DEFAULT_PROTOCOL);// Set default protocol
+        
+        //Process Sip-data
+        Parts = _Payload.split(Util.SEPERATOR_ENDSIPDATA);
+        SipData = Parts[0];
+        Parts2 = SipData.split(Util.STANDARD_SEPERATOR_SIGN);  
+        User = Parts2[0];
+        ServerDomain = Parts2[1];
+        ServerPort = Parts2[2];
+        Password = Parts2[3];
+        ValidTime = Parts2[4];
+        StorageFile.saveValidTime(ValidTime);     
+        
+        if(_Payload.contains(Util.SEPERATOR_ENDSTUNSERVER.replace("\\", "")))// Stun is using
+        {
+            Parts = Parts[1].split(Util.SEPERATOR_ENDSTUNSERVER);
+            StunData = Parts[0];
+            Parts2 = StunData.split(Util.STANDARD_SEPERATOR_SIGN); 
+            IsStunUse = Parts2[0];
+            StunServer = Parts2[1];
+            StunPort = Parts2[2];            
+            //TO-DO: Check value of IsStunUse and change IsStunUseBoolean if necessary
+            boolean IsStunUseBoolean = IsStunUse.equals("0") ? false : true;
+            SettingsEditor.putBoolean(Settings_Fragment.PREF_STUN, IsStunUseBoolean);
+            SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER, StunServer);
+            SettingsEditor.putString(Settings_Fragment.PREF_STUN_SERVER_PORT, StunPort);            
+        }
+        
+        if(_Payload.contains(Util.SEPERATOR_ENDWLAN.replace("\\", ""))) // WIFI setting is using
+        {
+            //TO-DO: Add Multiple WIFI settings
+            Parts = Parts[1].split(Util.SEPERATOR_ENDWLAN);
+            WlanData = Parts[0];
+            Parts2 = WlanData.split(Util.STANDARD_SEPERATOR_SIGN); 
+            SSID = Parts2[0];
+            Encryption = Integer.parseInt(Parts2[1]);             
+        }
+        
+        if(_Payload.contains(Util.SEPERATOR_ENDWLANPASSWORD.replace("\\", ""))) // WIFI suse encryption with pw
+        {
+            Parts = Parts[1].split(Util.SEPERATOR_ENDWLANPASSWORD);
+            WifiPassword = Parts[0];
+        }
+        if(SSID != null) //Add WLAN
+        {
+            Wifi Wifi = new Wifi(getActivity());
+            //TO-DO: Ask User really delete Network (maybe other network with same SSID already exists)
+            Wifi.removeWifiNetwork(Wifi.seachrWifiNetwork(SSID));        
+            Wifi.addWiFiNetwork( SSID , WifiPassword , Util.WiFiEncryption.values()[Encryption] );
+        }
+        if(Parts.length > 1) // Hotel Numbers is using
+        {            
+            Parts = Parts[1].split(Util.STANDARD_SEPERATOR_SIGN);
+            HotelContacts = new String[Parts.length / 2][2];
+            int ContactIndex = 0;
+            for (int Index = 0; Index < Parts.length ; Index +=2)
+            {
+                HotelContacts[ContactIndex][0] = Parts[Index];
+                HotelContacts[ContactIndex][1] = Parts[Index +1];
+                ContactIndex++;
+            }
+            ((MainActivity) getActivity()).createNewContactlist(HotelContacts);
+        }
+        
+        SettingsEditor.putString(Settings_Fragment.PREF_USERNAME, User);
+        SettingsEditor.putString(Settings_Fragment.PREF_SERVER, ServerDomain);
+        SettingsEditor.putString(Settings_Fragment.PREF_PORT, ServerPort);        
+        SettingsEditor.putString(Settings_Fragment.PREF_PASSWORD, Password);       
+        SettingsEditor.commit();
+        // Restart the Engine
+        Receiver.engine(getActivity()).halt();
+        Receiver.engine(getActivity()).StartEngine();
+        Log.i(LOG_TAG, "Process SIP-Data");
+        Toast.makeText(getActivity(), getString(R.string.setsipaccount) + User, Toast.LENGTH_SHORT).show();
     }
 
     // //////////////////////////////////////////////////////////////////////////////

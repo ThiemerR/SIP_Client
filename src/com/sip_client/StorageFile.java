@@ -1,6 +1,5 @@
 package com.sip_client;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -113,14 +112,10 @@ public class StorageFile
         FileOutputStream FileOutputStream = null;
         try
         {
-            FileOutputStream = MainActivity.getContext().openFileOutput(FILE_NAME_VALIDTIME, Context.MODE_PRIVATE);            
-            File CheckFile = new File(MainActivity.getContext().getFilesDir(),FILE_NAME_VALIDTIME);
-            if(CheckFile.exists())
-            {
-                Editor SettingsEditor = PreferenceManager.getDefaultSharedPreferences(MainActivity.getContext()).edit();
-                SettingsEditor.putString(Settings_Fragment.PREF_PASSWORD, "");
-                SettingsEditor.commit(); 
-            }
+            FileOutputStream = MainActivity.getContext().openFileOutput(FILE_NAME_VALIDTIME, Context.MODE_PRIVATE); 
+            Editor SettingsEditor = PreferenceManager.getDefaultSharedPreferences(MainActivity.getContext()).edit();
+            SettingsEditor.putString(Settings_Fragment.PREF_PASSWORD, "");
+            SettingsEditor.commit(); 
             FileOutputStream.write(_ValidTime.getBytes());
         }
         catch (IOException ioe)

@@ -9,29 +9,36 @@ public class Util
     private Util() {};
     
     //byte[] as Identification for NFC Message
-    public final static byte[]   ID_SEND_ALL = { 0x00,  };
-    public final static byte[]   ID_SEND_PW =  { 0x01,  };
+    public final static byte[]   ID_SEND_ALL            = { 0x00,  };
+    public final static byte[]   ID_SEND_PW             = { 0x01,  };
+    public final static byte[]   ID_SEND_ALL_WITHOUT_PW = { 0x02,  };
     
     //Request Code for activity result
     public final static int REQUEST_CODE_QRC = 50;    
     
     // ////////////////////////////////////////////////////////////////////////////// 
     //Separator for the Payload
-    // //////////////////////////////////////////////////////////////////////////////     
-    public final static String SERVER_START_SEPERATOR_SIGN = "|"; 
-    
-    public final static String SEPERATOR_USERNAME = "/us";
-    public final static String SEPERATOR_SERVERDOMAIN = "/sd" ; 
-    public final static String SEPERATOR_SERVERPORT =  "/po" ;
-    public final static String SEPERATOR_USESTUNSERVER = "/is" ; 
-    public final static String SEPERATOR_STUNSERVER = "/ss" ; 
-    public final static String SEPERATOR_STUNPORT =  "/sp" ; 
-    public final static String SEPERATOR_SIPPASSWORD =  "/pw" ;
-    public final static String SEPERATOR_VALIDTIME =  "/vt" ;
-    public final static String SEPERATOR_PHONENUMBER =  "/" ; 
-    public final static String SEPERATOR_SSID =  "/ws" ; 
-    public final static String SEPERATOR_WIFIPASSWORD = "/wp" ; 
-    public final static String SEPERATOR_WIFIENCRYPTION =  "/we" ; 
+    // //////////////////////////////////////////////////////////////////////////////   
+    /**
+     * Defines the first separator sign with "\\" for using in split method (regular expression)
+     */
+    public final static String STANDARD_SEPERATOR_SIGN = "\\|";
+    /**
+     * Use for setting end of sip-data
+     */
+    public final static String SEPERATOR_ENDSIPDATA = STANDARD_SEPERATOR_SIGN + "sd" ; 
+    /**
+     * Use for setting end of stunserver
+     */
+    public final static String SEPERATOR_ENDSTUNSERVER = STANDARD_SEPERATOR_SIGN + "ss" ; 
+    /**
+     * Use for setting end of WLAN
+     */
+    public final static String SEPERATOR_ENDWLAN = STANDARD_SEPERATOR_SIGN + "wl" ; 
+    /**
+     * Use for setting end of WLAN Password
+     */
+    public final static String SEPERATOR_ENDWLANPASSWORD = STANDARD_SEPERATOR_SIGN + "wp" ;    
     
     
     /**

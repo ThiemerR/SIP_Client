@@ -58,6 +58,8 @@ import com.sip_client.MainActivity;
  */
 public class Settings_Fragment extends PreferenceFragment implements OnSharedPreferenceChangeListener, OnClickListener
 {  
+    public static final String PREFS_NAME = "MyPrefsFile";
+    
     // All possible values of the PREF_PREF preference (see bellow)
     public static final String       VAL_PREF_PSTN            = "PSTN";
     public static final String       VAL_PREF_SIP             = "SIP";
@@ -272,8 +274,8 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     @Override
     public void onCreate(Bundle _SavedInstanceState)
     {
-        super.onCreate(_SavedInstanceState);
-
+        super.onCreate(_SavedInstanceState);        
+        
         if (Receiver.mContext == null)
             Receiver.mContext = getActivity();
         addPreferencesFromResource(R.xml.preferences);
@@ -300,7 +302,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
                 cb.setChecked(true);
                 Editor edit = PreferenceManager.getDefaultSharedPreferences(Receiver.mContext).edit();
 
-                edit.putString(PREF_PORT + j, "5061");
+                edit.putString(PREF_PORT + j, "5060");
                 edit.putString(PREF_SERVER + j, DEFAULT_SERVER);
                 edit.putString(PREF_PREF + j, DEFAULT_PREF);
                 edit.putString(PREF_PROTOCOL + j, DEFAULT_PROTOCOL);
@@ -379,6 +381,8 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     public void onResume()
     {
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        reload();
+        initSummary(getPreferenceScreen());
         super.onResume();
     }
     
@@ -386,7 +390,6 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
     @Override
     public void onPause()
     {
-
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
@@ -437,7 +440,7 @@ public class Settings_Fragment extends PreferenceFragment implements OnSharedPre
                     {
                         ListPreference lp = (ListPreference) getPreferenceScreen().findPreference(PREF_PORT + j);
                         lp.setValue(sharedPreferences.getString(PREF_PROTOCOL + j, DEFAULT_PROTOCOL).equals("tls") ? "5070"
-                                : "5061");
+                                : "5060");
                     }
                     else
                     {
